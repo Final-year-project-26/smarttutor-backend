@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 const crypto = require("crypto");
-const sendEmail = require("../utils/sendEmail");
+const { sendEmail } = require("../utils/sendEmail");
 
 // Register
 exports.register = async (req, res) => {
@@ -61,7 +61,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Please verify email first" });
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });

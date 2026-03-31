@@ -7,45 +7,59 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
     },
+
     password: {
       type: String,
       required: true,
-      minlength: 6,
-      select: false, // hide password by default
     },
+
     role: {
       type: String,
       enum: ["student", "tutor", "admin", "manager"],
       default: "student",
     },
-    isBlocked: {
-      type: Boolean,
-      default: false,
+
+    tutorStatus: {
+      type: String,
+      enum: ["none", "pending", "approved"],
+      default: "none",
     },
+
     isVerified: {
       type: Boolean,
       default: false,
     },
+
     verificationToken: String,
+
     resetPasswordToken: String,
+
     resetPasswordExpire: Date,
   },
-  { timestamps: true } // ✅ schema options go here
+  { timestamps: true }
 );
 
-// Hash password before saving
+// ============================
+// HASH PASSWORD BEFORE SAVE
+// ============================
 userSchema.pre("save", async function () {
+  // Only hash the password if it has been modified
   if (!this.isModified("password")) return;
-  this.password = await bcrypt.hash(this.password, 10);
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function (enteredPassword) {
+// ============================
+// COMPARE PASSWORD DURING LOGIN
+// ============================
+userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
