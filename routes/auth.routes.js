@@ -9,14 +9,15 @@ const {
   resetPassword
 } = require("../controllers/auth.controller");
 
+// TEST ROUTE
+router.get("/", (req, res) => {
+  res.send("Auth API working");
+});
+
 router.post("/register", register);
-
 router.post("/login", login);
-
 router.get("/verify/:token", verifyEmail);
-
 router.post("/forgot-password", forgotPassword);
-
 router.post("/reset-password/:token", resetPassword);
 
 module.exports = router;
